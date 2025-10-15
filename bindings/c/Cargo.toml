@@ -19,15 +19,22 @@ tokenizers = { path = "../../tokenizers" }
 
 # Use fancy-regex (pure Rust) for WASM - no C dependencies
 [target.'cfg(target_family = "wasm")'.dependencies]
-tokenizers = { path = "../../tokenizers", default-features = false, features = ["fancy-regex", "unstable_wasm"] }
+tokenizers = { path = "../../tokenizers", default-features = false, features = [
+  "fancy-regex",
+  "unstable_wasm",
+] }
 
 # Use fancy-regex (pure Rust) for iOS - no onig_sys cross-compilation
 [target.'cfg(target_os = "ios")'.dependencies]
-tokenizers = { path = "../../tokenizers", default-features = false, features = ["fancy-regex"] }
+tokenizers = { path = "../../tokenizers", default-features = false, features = [
+  "fancy-regex",
+] }
 
 # Use fancy-regex (pure Rust) for Android - no NDK onig_sys issues
 [target.'cfg(target_os = "android")'.dependencies]
-tokenizers = { path = "../../tokenizers", default-features = false, features = ["fancy-regex"] }
+tokenizers = { path = "../../tokenizers", default-features = false, features = [
+  "fancy-regex",
+] }
 
 [features]
 default = []
