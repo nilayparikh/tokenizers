@@ -1,0 +1,18 @@
+[package]
+name = "tokenizers-c"
+version = "0.22.2"
+authors = ["Huggingface/Nilay Parikh"]
+edition = "2021"
+license = "Apache-2.0"
+description = "C FFI bindings for tokenizers library - for .NET P/Invoke interop"
+
+[lib]
+name = "tokenizers"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+tokenizers = { path = "../../tokenizers" }
+libc = "0.2"
+
+[features]
+default = []
