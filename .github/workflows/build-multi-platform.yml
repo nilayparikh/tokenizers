@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., v1.0.0)'
+        description: "Release version (e.g., v1.0.0)"
         required: true
-        default: 'v1.0.0'
+        default: "v1.0.0"
       create_release:
-        description: 'Create GitHub Release'
+        description: "Create GitHub Release"
         required: false
         type: boolean
         default: true
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -30,25 +30,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: x86_64-unknown-linux-gnu
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/linux-x64/native
           cp target/x86_64-unknown-linux-gnu/release/libtokenizers.so artifacts/linux-x64/native/
           ls -lh artifacts/linux-x64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -64,32 +64,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-unknown-linux-gnu
           override: true
-      
+
       - name: Install cross-compilation tools
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         env:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
         run: |
           cargo build --release --target aarch64-unknown-linux-gnu
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/linux-arm64/native
           cp target/aarch64-unknown-linux-gnu/release/libtokenizers.so artifacts/linux-arm64/native/
           ls -lh artifacts/linux-arm64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -105,26 +105,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: x86_64-pc-windows-msvc
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target x86_64-pc-windows-msvc
-      
+
       - name: Prepare artifacts
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts/win-x64/native
           Copy-Item target/x86_64-pc-windows-msvc/release/tokenizers.dll artifacts/win-x64/native/
           Get-ChildItem artifacts/win-x64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -140,26 +140,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-pc-windows-msvc
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target aarch64-pc-windows-msvc
-      
+
       - name: Prepare artifacts
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts/win-arm64/native
           Copy-Item target/aarch64-pc-windows-msvc/release/tokenizers.dll artifacts/win-arm64/native/
           Get-ChildItem artifacts/win-arm64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -175,25 +175,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: x86_64-apple-darwin
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target x86_64-apple-darwin
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/osx-x64/native
           cp target/x86_64-apple-darwin/release/libtokenizers.dylib artifacts/osx-x64/native/
           ls -lh artifacts/osx-x64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -209,25 +209,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-apple-darwin
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target aarch64-apple-darwin
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/osx-arm64/native
           cp target/aarch64-apple-darwin/release/libtokenizers.dylib artifacts/osx-arm64/native/
           ls -lh artifacts/osx-arm64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -243,30 +243,30 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
           override: true
-      
+
       - name: Install wasm-pack
         run: |
           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      
+
       - name: Build tokenizers for WASM
         working-directory: tokenizers
         run: |
           cargo build --release --target wasm32-unknown-unknown --no-default-features
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/wasm32/native
           cp target/wasm32-unknown-unknown/release/tokenizers.wasm artifacts/wasm32/native/ || echo "WASM file may have different name"
           find target/wasm32-unknown-unknown/release -name "*.wasm" -exec cp {} artifacts/wasm32/native/ \; || true
           ls -lh artifacts/wasm32/native/ || echo "No artifacts generated"
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -283,26 +283,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-apple-ios
           override: true
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         run: |
           cargo build --release --target aarch64-apple-ios
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/ios-arm64/native
           cp target/aarch64-apple-ios/release/libtokenizers.a artifacts/ios-arm64/native/ || echo "Static lib may not exist"
           find target/aarch64-apple-ios/release -name "*.a" -exec cp {} artifacts/ios-arm64/native/ \; || true
           ls -lh artifacts/ios-arm64/native/ || echo "No artifacts"
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -319,14 +319,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: aarch64-linux-android
           override: true
-      
+
       - name: Setup Android NDK
         run: |
           sudo apt-get update
@@ -335,20 +335,20 @@ jobs:
           unzip -q android-ndk-r26d-linux.zip
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r26d" >> $GITHUB_ENV
           echo "NDK_LINKER_ARM64=$PWD/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang" >> $GITHUB_ENV
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         env:
           CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ env.NDK_LINKER_ARM64 }}
         run: |
           cargo build --release --target aarch64-linux-android
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/android-arm64/native
           cp target/aarch64-linux-android/release/libtokenizers.so artifacts/android-arm64/native/
           ls -lh artifacts/android-arm64/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -364,14 +364,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: armv7-linux-androideabi
           override: true
-      
+
       - name: Setup Android NDK
         run: |
           sudo apt-get update
@@ -380,20 +380,20 @@ jobs:
           unzip -q android-ndk-r26d-linux.zip
           echo "ANDROID_NDK_HOME=$PWD/android-ndk-r26d" >> $GITHUB_ENV
           echo "NDK_LINKER_ARM32=$PWD/android-ndk-r26d/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang" >> $GITHUB_ENV
-      
+
       - name: Build tokenizers
         working-directory: tokenizers
         env:
           CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER: ${{ env.NDK_LINKER_ARM32 }}
         run: |
           cargo build --release --target armv7-linux-androideabi
-      
+
       - name: Prepare artifacts
         run: |
           mkdir -p artifacts/android-arm32/native
           cp target/armv7-linux-androideabi/release/libtokenizers.so artifacts/android-arm32/native/
           ls -lh artifacts/android-arm32/native/
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -421,31 +421,31 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
-      
+
       - name: Create distribution packages
         run: |
           cd release-artifacts
-          
+
           # Create zip files for each platform
           for dir in tokenizers-*; do
             platform_name=$(echo $dir | sed 's/tokenizers-//')
             zip -r "hf-tokenizers-${platform_name}.zip" "$dir"
           done
-          
+
           # Create a combined package
           mkdir -p all-platforms
           for dir in tokenizers-*; do
             cp -r "$dir"/* all-platforms/
           done
           zip -r "hf-tokenizers-all-platforms.zip" all-platforms
-          
+
           ls -lh *.zip
-      
+
       - name: Get version
         id: get_version
         run: |
@@ -454,19 +454,19 @@ jobs:
           else
             echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Generate changelog
         id: changelog
         run: |
           cat > RELEASE_NOTES.md << 'EOF'
           # HuggingFace Tokenizers - Multi-Platform Native Libraries
-          
+
           ## Version ${{ steps.get_version.outputs.version }}
-          
+
           Pre-built native libraries for HuggingFace Tokenizers across multiple platforms.
-          
+
           ### 📦 Supported Platforms
-          
+
           | Platform | RID | Architecture | Status |
           |----------|-----|--------------|--------|
           | Linux | `linux-x64` | x86_64 | ✅ Tested |
@@ -479,48 +479,48 @@ jobs:
           | iOS | `ios-arm64` | ARM64 | ⚠️ Static Library |
           | Android | `android-arm64` | ARM64 | ✅ Built |
           | Android | `android-arm32` | ARM32 | ✅ Built |
-          
+
           ### 📥 Download
-          
+
           - **Individual platforms**: Download `hf-tokenizers-{platform}.zip`
           - **All platforms**: Download `hf-tokenizers-all-platforms.zip`
-          
+
           ### 🚀 Usage
-          
+
           1. Download the appropriate platform package
           2. Extract to your project's `native/runtimes/{rid}/native/` directory
           3. The .NET wrapper will automatically detect and load the correct library
-          
+
           ### 🔧 Integration
-          
+
           ```xml
           <!-- In your .csproj -->
           <ItemGroup>
             <Content Include="native\runtimes\**\*" PackagePath="runtimes" />
           </ItemGroup>
           ```
-          
+
           ### 📝 Notes
-          
+
           - All libraries built from HuggingFace Tokenizers repository
           - Rust version: stable
           - Build date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
+
           ### ✨ Features
-          
+
           - ✅ BPE (Byte-Pair Encoding)
           - ✅ WordPiece
           - ✅ Unigram (SentencePiece algorithm)
           - ✅ Pre-tokenizers, Normalizers, Post-processors
           - ✅ 100% parity with Python tokenizers library
-          
+
           ---
-          
+
           **Built with ❤️ using GitHub Actions**
           EOF
-          
+
           cat RELEASE_NOTES.md
-      
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -533,7 +533,7 @@ jobs:
             release-artifacts/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Summary
         run: |
           echo "## 🎉 Release Created Successfully!" >> $GITHUB_STEP_SUMMARY
