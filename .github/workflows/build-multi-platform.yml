@@ -122,7 +122,16 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts/win-x64/native
-          Copy-Item bindings/c/target/x86_64-pc-windows-msvc/release/tokenizers.dll artifacts/win-x64/native/
+          if (Test-Path "bindings/c/target/x86_64-pc-windows-msvc/release/tokenizers.dll") {
+            Copy-Item "bindings/c/target/x86_64-pc-windows-msvc/release/tokenizers.dll" "artifacts/win-x64/native/"
+            Write-Host "✅ DLL found and copied"
+          } else {
+            Write-Host "❌ Error: tokenizers.dll not found!"
+            Get-ChildItem -Path "bindings/c/target" -Recurse -Filter "*.dll" | ForEach-Object {
+              Write-Host "Found: $($_.FullName)"
+            }
+            exit 1
+          }
           Get-ChildItem artifacts/win-x64/native/
 
       - name: Upload artifact
@@ -157,7 +166,16 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts/win-arm64/native
-          Copy-Item bindings/c/target/aarch64-pc-windows-msvc/release/tokenizers.dll artifacts/win-arm64/native/
+          if (Test-Path "bindings/c/target/aarch64-pc-windows-msvc/release/tokenizers.dll") {
+            Copy-Item "bindings/c/target/aarch64-pc-windows-msvc/release/tokenizers.dll" "artifacts/win-arm64/native/"
+            Write-Host "✅ DLL found and copied"
+          } else {
+            Write-Host "❌ Error: tokenizers.dll not found!"
+            Get-ChildItem -Path "bindings/c/target" -Recurse -Filter "*.dll" | ForEach-Object {
+              Write-Host "Found: $($_.FullName)"
+            }
+            exit 1
+          }
           Get-ChildItem artifacts/win-arm64/native/
 
       - name: Upload artifact
